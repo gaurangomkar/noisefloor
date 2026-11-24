@@ -1,0 +1,33 @@
+name: Feature request
+description: A source, reporter, or scoring change.
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Which rule or workflow is hard to score today, and what decision the report should help you make.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: The behavior you want, including new config keys if you have them in mind.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - source
+        - reporter
+        - score
+        - cli
+        - docs
+        - other
+    validations:
+      required: true
