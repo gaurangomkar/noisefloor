@@ -12,6 +12,7 @@ import (
 
 	_ "time/tzdata"
 
+	"github.com/gaurangomkar/noisefloor/internal/duration"
 	"github.com/gaurangomkar/noisefloor/internal/model"
 )
 
@@ -159,7 +160,7 @@ func ttrText(samples int, seconds float64) string {
 	if samples == 0 {
 		return "n/a"
 	}
-	return time.Duration(seconds * float64(time.Second)).Round(time.Second).String()
+	return duration.Format(time.Duration(seconds * float64(time.Second)).Round(time.Second))
 }
 
 func ruleLocation(r *model.RuleMatch) string {

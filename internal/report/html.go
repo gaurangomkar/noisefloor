@@ -105,16 +105,11 @@ var (
 func htmlTemplate() (*template.Template, error) {
 	tmplOnce.Do(func() {
 		tmpl, tmplErr = template.New("report").Funcs(template.FuncMap{
-			"score": scoreText,
-			"pct":   pct,
-			"ttr":   ttrText,
-			"num":   trimFloat,
-			"upper1": func(s string) string {
-				if s == "" {
-					return ""
-				}
-				return strings.ToUpper(s[:1]) + s[1:]
-			},
+			"score":  scoreText,
+			"pct":    pct,
+			"ttr":    ttrText,
+			"num":    trimFloat,
+			"upper1": model.ActionTitle,
 			"first": func(ss []string) string {
 				if len(ss) == 0 {
 					return ""
@@ -173,7 +168,7 @@ const htmlPage = `<!DOCTYPE html>
   <h1>Alert hygiene report</h1>
   <p class="muted">Window {{.Window}}. Generated {{.Generated}}.</p>
   {{if .Report.Summary.ThresholdExceeded}}
-  <div class="banner bad">The noise threshold is exceeded: {{.Report.Summary.NoisyRules}} rule(s) at or above {{score .Report.Summary.MaxNoiseScore}}, and {{.Report.Summary.MaxNoisyRules}} are allowed.</div>
+  <div class="banner bad">The noise threshold is exceeded: {{.Report.Summary.NoisyRules}} rule(s) scored at or above {{score .Report.Summary.MaxNoiseScore}}, and {{.Report.Summary.MaxNoisyRules}} are allowed.</div>
   {{else}}
   <div class="banner">No rule is at or above the {{score .Report.Summary.MaxNoiseScore}} noise threshold.</div>
   {{end}}
