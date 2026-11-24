@@ -9,6 +9,21 @@ import (
 	"time"
 )
 
+// Format renders a duration the way a rule file would, without a trailing zero
+// unit. 2 minutes is "2m", not "2m0s".
+func Format(d time.Duration) string {
+	if d <= 0 {
+		return "0s"
+	}
+	if d%time.Hour == 0 {
+		return fmt.Sprintf("%dh", int(d/time.Hour))
+	}
+	if d%time.Minute == 0 {
+		return fmt.Sprintf("%dm", int(d/time.Minute))
+	}
+	return d.Round(time.Second).String()
+}
+
 // Parse accepts a Go duration ("90s", "1h30m", "1.5h") or a Prometheus
 // duration with d and w units ("7d", "1d12h", "2w"). A day is 24 hours and a
 // week is 7 days. The empty string is an error; callers that treat it as zero
