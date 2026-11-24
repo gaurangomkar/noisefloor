@@ -1,0 +1,61 @@
+name: weekly report
+
+on:
+  schedule:
+    # Monday 13:00 UTC.
+    - cron: "0 13 * * 1"
+  workflow_dispatch:
+    inputs:
+      config:
+        description: Path to noisefloor.yaml
+        default: noisefloor.yaml
+        required: false
+      post_issue:
+        description: Post the report as a GitHub issue
+        default: "true"
+        required: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Generate report
+        id: report
+        env:
+          CONFIG: ${{ github.event.inputs.config || 'noisefloor.yaml' }}
+        run: |
+          set -euo pipefail
+          if [ ! -f "$CONFIG" ]; then
+            echo "No $CONFIG in the repository. Add one to enable the weekly report." >> "$GITHUB_STEP_SUMMARY"
+            echo "ran=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          go run ./cmd/noisefloor report \
+            --config "$CONFIG" \
+            --output noisefloor-out \
+            --fail-on-threshold=false
+          echo "ran=true" >> "$GITHUB_OUTPUT"
+      - name: Job summary
+        if: steps.report.outputs.ran == 'true'
+        run: cat noisefloor-out/noisefloor.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish issue
+        if: steps.report.outputs.ran == 'true' && github.event.inputs.post_issue != 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPORT: noisefloor-out/noisefloor.md
+        run: bash .github/actions/noisefloor/publish.sh
+      - name: Upload report
+        if: steps.report.outputs.ran == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: noisefloor-report
+          path: noisefloor-out/

@@ -1,0 +1,8 @@
+.git
+dist
+out
+testdata
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
