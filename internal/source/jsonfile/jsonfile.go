@@ -46,9 +46,12 @@ func (s Source) Fetch(ctx context.Context, window model.Window) (source.Result, 
 	if len(data) > amjson.MaxBytes {
 		return source.Result{}, fmt.Errorf("read %s: file exceeds %d bytes", s.Path, amjson.MaxBytes)
 	}
-	now := time.Now()
+	now := window.End
 	if s.Now != nil {
 		now = s.Now()
+	}
+	if now.IsZero() {
+		now = time.Now()
 	}
 	events, err := amjson.Parse(data, now)
 	if err != nil {

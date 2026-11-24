@@ -1,0 +1,64 @@
+# Sample week of 23 Feb 2026 through 2 Mar 2026. The dates are pinned so
+# `noisefloor report --config examples/quickstart.yaml` is reproducible.
+window: 168h
+now: 2026-03-02T00:00:00Z
+timezone: UTC
+
+business_hours:
+  timezone: America/New_York
+  days: [mon, tue, wed, thu, fri]
+  start: "09:00"
+  end: "17:00"
+
+sources:
+  files:
+    - path: alerts.ndjson
+
+rules:
+  paths:
+    - rules.yaml
+
+grouping:
+  labels: [team]
+  fallback: unowned
+
+ignore:
+  alertnames:
+    - Watchdog
+    - InfoInhibitor
+
+flap:
+  window: 15m
+
+scoring:
+  volume_cap: 30
+  actionable_after: 10m
+  auto_resolve_grace: 5m
+
+weights:
+  volume: 1
+  flap: 2
+  short_ttr: 1.5
+  auto_resolve: 2
+  off_hours: 1
+  duplicate: 1.2
+
+thresholds:
+  max_noise_score: 60
+  max_noisy_rules: 0
+  fail_on_threshold: true
+
+recommendations:
+  min_fires: 5
+  tune_flap_rate: 0.30
+  tune_duplicate_ratio: 0.30
+  tune_off_hours_rate: 0.50
+  mute_auto_resolve: 0.75
+  slo_min_fires: 15
+
+output:
+  dir: out
+  formats: [markdown, html, json]
+  markdown: noisefloor.md
+  html: noisefloor.html
+  json: noisefloor.json

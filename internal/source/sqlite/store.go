@@ -95,6 +95,28 @@ CREATE INDEX IF NOT EXISTS events_starts_at ON events (starts_at);
 // Name implements source.Source.
 func (s *Store) Name() string { return "sqlite" }
 
+// File reads a database created by the webhook. It does not create a missing file,
+// so a typo in the path fails the report instead of scoring an empty week.
+type File struct {
+	Path string
+}
+
+// Name implements source.Source.
+func (f File) Name() string { return "sqlite" }
+
+// Fetch implements source.Source.
+func (f File) Fetch(ctx context.Context, window model.Window) (source.Result, error) {
+	if _, err := os.Stat(f.Path); err != nil {
+		return source.Result{}, fmt.Errorf("sqlite: %w", err)
+	}
+	s, err := Open(f.Path)
+	if err != nil {
+		return source.Result{}, err
+	}
+	defer s.Close()
+	return s.Fetch(ctx, window)
+}
+
 // Upsert writes events. A later resolved notification updates the open row
 // instead of inserting a second firing.
 func (s *Store) Upsert(ctx context.Context, events []model.Event) error {

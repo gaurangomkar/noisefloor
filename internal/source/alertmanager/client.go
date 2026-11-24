@@ -81,9 +81,12 @@ func (c Client) Fetch(ctx context.Context, window model.Window) (source.Result, 
 		}
 		return source.Result{}, fmt.Errorf("alertmanager: %s: %s", resp.Status, snippet)
 	}
-	now := time.Now()
+	now := window.End
 	if c.Now != nil {
 		now = c.Now()
+	}
+	if now.IsZero() {
+		now = time.Now()
 	}
 	events, err := amjson.Parse(body, now)
 	if err != nil {
