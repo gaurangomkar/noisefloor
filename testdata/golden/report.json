@@ -1,0 +1,730 @@
+{
+  "scorer_version": "1",
+  "generated_at": "2026-03-02T00:00:00Z",
+  "window_start": "2026-02-23T00:00:00Z",
+  "window_end": "2026-03-02T00:00:00Z",
+  "timezone": "UTC",
+  "sources": [
+    {
+      "name": "file:alerts.ndjson",
+      "events": 72
+    }
+  ],
+  "summary": {
+    "events": 69,
+    "ignored": 3,
+    "dropped": 0,
+    "rules": 7,
+    "noisy_rules": 1,
+    "max_noise_score": 60,
+    "max_noisy_rules": 0,
+    "threshold_exceeded": true,
+    "worst_score": 68.01,
+    "worst_rule": "InstanceDown (platform)",
+    "recommendations": {
+      "keep": 2,
+      "mute": 1,
+      "slo": 1,
+      "tune": 3
+    },
+    "business_hours": "Mon, Tue, Wed, Thu, Fri 09:00-17:00 America/New_York",
+    "flap_window": "15m",
+    "auto_resolve_grace": "5m",
+    "volume_cap": 30,
+    "actionable_after": "10m"
+  },
+  "rules": [
+    {
+      "alertname": "InstanceDown",
+      "group": {
+        "team": "platform"
+      },
+      "group_key": "InstanceDown\u001fteam=platform",
+      "team": "platform",
+      "score": 68.01,
+      "recommendation": "tune",
+      "reasons": [
+        "19 of 20 instances re-fired within 15m of resolving (95.0%). Median time to resolve is 1m. Raise `for` (currently 30s) so the condition must hold through those blips, or set `keep_firing_for` to at least 15m."
+      ],
+      "metrics": {
+        "fires": 20,
+        "flaps": 19,
+        "flap_rate": 0.95,
+        "resolved": 20,
+        "still_firing": 0,
+        "carried_in": 0,
+        "median_ttr_seconds": 60,
+        "p90_ttr_seconds": 60,
+        "ttr_samples": 20,
+        "auto_resolve_ratio": 1,
+        "auto_resolve_method": "grace",
+        "auto_resolve_samples": 20,
+        "pages": 20,
+        "off_hours_pages": 0,
+        "off_hours_rate": 0,
+        "duplicates": 0,
+        "duplicate_rate": 0,
+        "silenced": 0,
+        "inhibited": 0
+      },
+      "components": [
+        {
+          "name": "auto_resolve",
+          "weight": 2,
+          "value": 1,
+          "points": 22.99
+        },
+        {
+          "name": "flap",
+          "weight": 2,
+          "value": 0.95,
+          "points": 21.84
+        },
+        {
+          "name": "short_ttr",
+          "weight": 1.5,
+          "value": 0.9,
+          "points": 15.52
+        },
+        {
+          "name": "volume",
+          "weight": 1,
+          "value": 0.6667,
+          "points": 7.66
+        },
+        {
+          "name": "duplicate",
+          "weight": 1.2,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "off_hours",
+          "weight": 1,
+          "value": 0,
+          "points": 0
+        }
+      ],
+      "rule": {
+        "file": "rules.yaml",
+        "group": "platform",
+        "line": 31,
+        "expr": "up == 0",
+        "for": "30s",
+        "labels": {
+          "severity": "page",
+          "team": "platform"
+        },
+        "annotations": {
+          "summary": "An instance is down."
+        }
+      },
+      "examples": [
+        {
+          "alertname": "InstanceDown",
+          "instance": "web-1",
+          "severity": "page",
+          "team": "platform"
+        }
+      ]
+    },
+    {
+      "alertname": "PodRestarted",
+      "group": {
+        "team": "platform"
+      },
+      "group_key": "PodRestarted\u001fteam=platform",
+      "team": "platform",
+      "score": 42.25,
+      "recommendation": "mute",
+      "reasons": [
+        "100.0% of resolved instances cleared before anyone acknowledged them (measured from acknowledgement timestamps, median time to resolve 1m30s). Stop paging on this rule: route it to a ticket or a dashboard, or delete it if the condition is not actionable."
+      ],
+      "metrics": {
+        "fires": 12,
+        "flaps": 0,
+        "flap_rate": 0,
+        "resolved": 12,
+        "still_firing": 0,
+        "carried_in": 0,
+        "median_ttr_seconds": 90,
+        "p90_ttr_seconds": 90,
+        "ttr_samples": 12,
+        "auto_resolve_ratio": 1,
+        "auto_resolve_method": "ack",
+        "auto_resolve_samples": 12,
+        "pages": 0,
+        "off_hours_pages": 0,
+        "off_hours_rate": 0,
+        "duplicates": 0,
+        "duplicate_rate": 0,
+        "silenced": 0,
+        "inhibited": 0
+      },
+      "components": [
+        {
+          "name": "auto_resolve",
+          "weight": 2,
+          "value": 1,
+          "points": 22.99
+        },
+        {
+          "name": "short_ttr",
+          "weight": 1.5,
+          "value": 0.85,
+          "points": 14.66
+        },
+        {
+          "name": "volume",
+          "weight": 1,
+          "value": 0.4,
+          "points": 4.6
+        },
+        {
+          "name": "duplicate",
+          "weight": 1.2,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "flap",
+          "weight": 2,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "off_hours",
+          "weight": 1,
+          "value": 0,
+          "points": 0
+        }
+      ],
+      "rule": {
+        "file": "rules.yaml",
+        "group": "platform",
+        "line": 39,
+        "expr": "increase(kube_pod_container_status_restarts_total[15m]) > 0",
+        "for": "1m",
+        "labels": {
+          "severity": "warning",
+          "team": "platform"
+        },
+        "annotations": {
+          "summary": "A container restarted."
+        }
+      },
+      "examples": [
+        {
+          "alertname": "PodRestarted",
+          "pod": "api-0",
+          "severity": "warning",
+          "team": "platform"
+        },
+        {
+          "alertname": "PodRestarted",
+          "pod": "api-1",
+          "severity": "warning",
+          "team": "platform"
+        },
+        {
+          "alertname": "PodRestarted",
+          "pod": "api-10",
+          "severity": "warning",
+          "team": "platform"
+        }
+      ]
+    },
+    {
+      "alertname": "Edge5xxRate",
+      "group": {
+        "team": "edge"
+      },
+      "group_key": "Edge5xxRate\u001fteam=edge",
+      "team": "edge",
+      "score": 16.86,
+      "recommendation": "tune",
+      "reasons": [
+        "8 of 8 instances overlapped a different fingerprint of this alert (100.0%). Aggregate the expression, or drop high-cardinality labels, so one incident produces one alert."
+      ],
+      "metrics": {
+        "fires": 8,
+        "flaps": 0,
+        "flap_rate": 0,
+        "resolved": 8,
+        "still_firing": 0,
+        "carried_in": 0,
+        "median_ttr_seconds": 1800,
+        "p90_ttr_seconds": 1800,
+        "ttr_samples": 8,
+        "auto_resolve_ratio": 0,
+        "auto_resolve_method": "ack",
+        "auto_resolve_samples": 8,
+        "pages": 8,
+        "off_hours_pages": 0,
+        "off_hours_rate": 0,
+        "duplicates": 8,
+        "duplicate_rate": 1,
+        "silenced": 0,
+        "inhibited": 0
+      },
+      "components": [
+        {
+          "name": "duplicate",
+          "weight": 1.2,
+          "value": 1,
+          "points": 13.79
+        },
+        {
+          "name": "volume",
+          "weight": 1,
+          "value": 0.2667,
+          "points": 3.07
+        },
+        {
+          "name": "auto_resolve",
+          "weight": 2,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "flap",
+          "weight": 2,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "off_hours",
+          "weight": 1,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "short_ttr",
+          "weight": 1.5,
+          "value": 0,
+          "points": 0
+        }
+      ],
+      "rule": {
+        "file": "rules.yaml",
+        "group": "edge",
+        "line": 51,
+        "expr": "sum by (instance) (rate(http_requests_total{job=\"edge\",status=~\"5..\"}[5m])) > 0.05",
+        "for": "5m",
+        "labels": {
+          "severity": "page",
+          "team": "edge"
+        },
+        "annotations": {
+          "summary": "One edge instance is returning 5xx responses."
+        }
+      },
+      "examples": [
+        {
+          "alertname": "Edge5xxRate",
+          "instance": "edge-0",
+          "severity": "page",
+          "team": "edge"
+        },
+        {
+          "alertname": "Edge5xxRate",
+          "instance": "edge-1",
+          "severity": "page",
+          "team": "edge"
+        },
+        {
+          "alertname": "Edge5xxRate",
+          "instance": "edge-2",
+          "severity": "page",
+          "team": "edge"
+        }
+      ]
+    },
+    {
+      "alertname": "CertificateExpiring",
+      "group": {
+        "team": "security"
+      },
+      "group_key": "CertificateExpiring\u001fteam=security",
+      "team": "security",
+      "score": 13.79,
+      "recommendation": "tune",
+      "reasons": [
+        "6 of 6 pages started outside business hours (100.0%). Page only during the working day, or open a ticket overnight and deliver it at the start of the next business day."
+      ],
+      "metrics": {
+        "fires": 6,
+        "flaps": 0,
+        "flap_rate": 0,
+        "resolved": 6,
+        "still_firing": 0,
+        "carried_in": 0,
+        "median_ttr_seconds": 1800,
+        "p90_ttr_seconds": 1800,
+        "ttr_samples": 6,
+        "auto_resolve_ratio": 0,
+        "auto_resolve_method": "ack",
+        "auto_resolve_samples": 6,
+        "pages": 6,
+        "off_hours_pages": 6,
+        "off_hours_rate": 1,
+        "duplicates": 0,
+        "duplicate_rate": 0,
+        "silenced": 0,
+        "inhibited": 0
+      },
+      "components": [
+        {
+          "name": "off_hours",
+          "weight": 1,
+          "value": 1,
+          "points": 11.49
+        },
+        {
+          "name": "volume",
+          "weight": 1,
+          "value": 0.2,
+          "points": 2.3
+        },
+        {
+          "name": "auto_resolve",
+          "weight": 2,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "duplicate",
+          "weight": 1.2,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "flap",
+          "weight": 2,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "short_ttr",
+          "weight": 1.5,
+          "value": 0,
+          "points": 0
+        }
+      ],
+      "rule": {
+        "file": "rules.yaml",
+        "group": "security",
+        "line": 61,
+        "expr": "(probe_ssl_earliest_cert_expiry - time()) < 14 * 24 * 3600",
+        "for": "1h",
+        "labels": {
+          "severity": "page",
+          "team": "security"
+        },
+        "annotations": {
+          "summary": "A certificate expires within 14 days."
+        }
+      },
+      "examples": [
+        {
+          "alertname": "CertificateExpiring",
+          "instance": "edge",
+          "severity": "page",
+          "team": "security"
+        }
+      ]
+    },
+    {
+      "alertname": "CheckoutLatencyHigh",
+      "group": {
+        "team": "payments"
+      },
+      "group_key": "CheckoutLatencyHigh\u001fteam=payments",
+      "team": "payments",
+      "score": 6.9,
+      "recommendation": "slo",
+      "reasons": [
+        "18 instances in the window on a symptom signal (`histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket{job=\"checkout\"}[5m]))) > 0.4`). Page on a multi-window burn rate instead, for example 5m and 1h at 14.4x plus 30m and 6h at 6x, and keep a single-threshold rule as a ticket only."
+      ],
+      "metrics": {
+        "fires": 18,
+        "flaps": 0,
+        "flap_rate": 0,
+        "resolved": 18,
+        "still_firing": 0,
+        "carried_in": 0,
+        "median_ttr_seconds": 1500,
+        "p90_ttr_seconds": 1500,
+        "ttr_samples": 18,
+        "auto_resolve_ratio": 0,
+        "auto_resolve_method": "ack",
+        "auto_resolve_samples": 18,
+        "pages": 18,
+        "off_hours_pages": 0,
+        "off_hours_rate": 0,
+        "duplicates": 0,
+        "duplicate_rate": 0,
+        "silenced": 0,
+        "inhibited": 0
+      },
+      "components": [
+        {
+          "name": "volume",
+          "weight": 1,
+          "value": 0.6,
+          "points": 6.9
+        },
+        {
+          "name": "auto_resolve",
+          "weight": 2,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "duplicate",
+          "weight": 1.2,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "flap",
+          "weight": 2,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "off_hours",
+          "weight": 1,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "short_ttr",
+          "weight": 1.5,
+          "value": 0,
+          "points": 0
+        }
+      ],
+      "rule": {
+        "file": "rules.yaml",
+        "group": "checkout",
+        "line": 4,
+        "expr": "histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket{job=\"checkout\"}[5m]))) > 0.4",
+        "for": "2m",
+        "labels": {
+          "severity": "page",
+          "team": "payments"
+        },
+        "annotations": {
+          "runbook": "https://example.com/runbooks/checkout-latency",
+          "summary": "Checkout p99 latency is above 400ms."
+        }
+      },
+      "examples": [
+        {
+          "alertname": "CheckoutLatencyHigh",
+          "job": "checkout",
+          "severity": "page",
+          "team": "payments"
+        }
+      ]
+    },
+    {
+      "alertname": "APIErrorBudgetBurn",
+      "group": {
+        "team": "payments"
+      },
+      "group_key": "APIErrorBudgetBurn\u001fteam=payments",
+      "team": "payments",
+      "score": 1.15,
+      "recommendation": "keep",
+      "reasons": [
+        "Noise score 1.1 is under the 60.0 review threshold."
+      ],
+      "metrics": {
+        "fires": 3,
+        "flaps": 0,
+        "flap_rate": 0,
+        "resolved": 3,
+        "still_firing": 0,
+        "carried_in": 0,
+        "median_ttr_seconds": 1200,
+        "p90_ttr_seconds": 1200,
+        "ttr_samples": 3,
+        "auto_resolve_ratio": 0,
+        "auto_resolve_method": "ack",
+        "auto_resolve_samples": 3,
+        "pages": 3,
+        "off_hours_pages": 0,
+        "off_hours_rate": 0,
+        "duplicates": 0,
+        "duplicate_rate": 0,
+        "silenced": 0,
+        "inhibited": 0
+      },
+      "components": [
+        {
+          "name": "volume",
+          "weight": 1,
+          "value": 0.1,
+          "points": 1.15
+        },
+        {
+          "name": "auto_resolve",
+          "weight": 2,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "duplicate",
+          "weight": 1.2,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "flap",
+          "weight": 2,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "off_hours",
+          "weight": 1,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "short_ttr",
+          "weight": 1.5,
+          "value": 0,
+          "points": 0
+        }
+      ],
+      "rule": {
+        "file": "rules.yaml",
+        "group": "checkout",
+        "line": 21,
+        "expr": "job:slo_burnrate1h{job=\"api\"} > 14.4 and job:slo_burnrate5m{job=\"api\"} > 14.4",
+        "for": "2m",
+        "labels": {
+          "severity": "page",
+          "team": "payments"
+        },
+        "annotations": {
+          "summary": "The API error budget is burning."
+        }
+      },
+      "examples": [
+        {
+          "alertname": "APIErrorBudgetBurn",
+          "job": "api",
+          "severity": "page",
+          "team": "payments"
+        }
+      ]
+    },
+    {
+      "alertname": "APIDown",
+      "group": {
+        "team": "payments"
+      },
+      "group_key": "APIDown\u001fteam=payments",
+      "team": "payments",
+      "score": 0.77,
+      "recommendation": "keep",
+      "reasons": [
+        "Noise score 0.8 is under the 60.0 review threshold."
+      ],
+      "metrics": {
+        "fires": 2,
+        "flaps": 0,
+        "flap_rate": 0,
+        "resolved": 2,
+        "still_firing": 0,
+        "carried_in": 0,
+        "median_ttr_seconds": 2550,
+        "p90_ttr_seconds": 2670,
+        "ttr_samples": 2,
+        "auto_resolve_ratio": 0,
+        "auto_resolve_method": "ack",
+        "auto_resolve_samples": 2,
+        "pages": 2,
+        "off_hours_pages": 0,
+        "off_hours_rate": 0,
+        "duplicates": 0,
+        "duplicate_rate": 0,
+        "silenced": 0,
+        "inhibited": 0
+      },
+      "components": [
+        {
+          "name": "volume",
+          "weight": 1,
+          "value": 0.0667,
+          "points": 0.77
+        },
+        {
+          "name": "auto_resolve",
+          "weight": 2,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "duplicate",
+          "weight": 1.2,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "flap",
+          "weight": 2,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "off_hours",
+          "weight": 1,
+          "value": 0,
+          "points": 0
+        },
+        {
+          "name": "short_ttr",
+          "weight": 1.5,
+          "value": 0,
+          "points": 0
+        }
+      ],
+      "rule": {
+        "file": "rules.yaml",
+        "group": "checkout",
+        "line": 13,
+        "expr": "probe_success{job=\"checkout\"} == 0",
+        "for": "1m",
+        "labels": {
+          "severity": "page",
+          "team": "payments"
+        },
+        "annotations": {
+          "summary": "The checkout probe is failing."
+        }
+      },
+      "examples": [
+        {
+          "alertname": "APIDown",
+          "job": "checkout",
+          "severity": "page",
+          "team": "payments"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Loaded 7 alerting rule(s) from 1 file(s).",
+    "Scored 69 instances after ignoring 3 and dropping 0 with no start time.",
+    "A flap is a firing that starts within 15m after the previous instance of the same fingerprint resolved.",
+    "Business hours: Mon, Tue, Wed, Thu, Fri 09:00-17:00 America/New_York.",
+    "A page is an alert whose severity is one of: page, critical, high. Alerts with no severity label count as pages.",
+    "Auto-resolve uses acknowledgement timestamps when a source recorded them. Otherwise a resolution within 5m counts as auto-resolve.",
+    "The noise score is 100 times the weighted mean of volume (fires / 30, capped at 1), flap rate, short time-to-resolve, auto-resolve ratio, off-hours page ratio, and overlap ratio."
+  ]
+}

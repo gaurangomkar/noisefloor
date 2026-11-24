@@ -1,0 +1,19 @@
+# Snippet for Alertmanager. send_resolved must be true; noisefloor counts
+# a flap from the resolve notification and the next firing.
+route:
+  receiver: noisefloor
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  group_by: [alertname, cluster]
+
+receivers:
+  - name: noisefloor
+    webhook_configs:
+      - url: http://noisefloor:8080/webhook
+        send_resolved: true
+        # When webhook.token is set, send it as a bearer token.
+        # http_config:
+        #   authorization:
+        #     type: Bearer
+        #     credentials_file: /etc/alertmanager/noisefloor-token

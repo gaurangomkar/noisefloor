@@ -1,0 +1,68 @@
+groups:
+  - name: checkout
+    rules:
+      - alert: CheckoutLatencyHigh
+        expr: histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket{job="checkout"}[5m]))) > 0.4
+        for: 2m
+        labels:
+          severity: page
+          team: payments
+        annotations:
+          summary: Checkout p99 latency is above 400ms.
+          runbook: https://example.com/runbooks/checkout-latency
+      - alert: APIDown
+        expr: probe_success{job="checkout"} == 0
+        for: 1m
+        labels:
+          severity: page
+          team: payments
+        annotations:
+          summary: The checkout probe is failing.
+      - alert: APIErrorBudgetBurn
+        expr: job:slo_burnrate1h{job="api"} > 14.4 and job:slo_burnrate5m{job="api"} > 14.4
+        for: 2m
+        labels:
+          severity: page
+          team: payments
+        annotations:
+          summary: The API error budget is burning.
+  - name: platform
+    rules:
+      - alert: InstanceDown
+        expr: up == 0
+        for: 30s
+        labels:
+          severity: page
+          team: platform
+        annotations:
+          summary: An instance is down.
+      - alert: PodRestarted
+        expr: increase(kube_pod_container_status_restarts_total[15m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: A container restarted.
+      - record: job:up:count
+        expr: count(up)
+  - name: edge
+    rules:
+      - alert: Edge5xxRate
+        expr: sum by (instance) (rate(http_requests_total{job="edge",status=~"5.."}[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: page
+          team: edge
+        annotations:
+          summary: One edge instance is returning 5xx responses.
+  - name: security
+    rules:
+      - alert: CertificateExpiring
+        expr: (probe_ssl_earliest_cert_expiry - time()) < 14 * 24 * 3600
+        for: 1h
+        labels:
+          severity: page
+          team: security
+        annotations:
+          summary: A certificate expires within 14 days.
