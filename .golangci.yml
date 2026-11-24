@@ -1,0 +1,35 @@
+run:
+  timeout: 5m
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - misspell
+    - gofmt
+    - goimports
+    - gosec
+    - unparam
+    - gocyclo
+
+linters-settings:
+  gocyclo:
+    min-complexity: 30
+  goimports:
+    local-prefixes: github.com/gaurangomkar/noisefloor
+  gosec:
+    excludes:
+      - G304 # paths come from the operator's config
+      - G404 # math/rand is not used for secrets
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gosec
+        - gocyclo
+        - errcheck

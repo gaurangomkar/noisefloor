@@ -1,0 +1,68 @@
+name: Noisefloor report
+description: Score alert history and publish the alert-hygiene report.
+
+inputs:
+  config:
+    description: Path to noisefloor.yaml, relative to the workspace.
+    required: true
+  version:
+    description: Module version, tag, or branch to install. Use a release tag once one exists.
+    required: false
+    default: main
+  output:
+    description: Directory for the report files.
+    required: false
+    default: noisefloor-out
+  formats:
+    description: Comma-separated formats. markdown, html, json.
+    required: false
+    default: markdown,html,json
+  fail_on_threshold:
+    description: Exit non-zero when a noise threshold is exceeded.
+    required: false
+    default: "true"
+  post_issue:
+    description: Open or comment on a GitHub issue with the markdown report.
+    required: false
+    default: "true"
+  issue_title:
+    description: Issue title. Defaults to "Alert hygiene report YYYY-MM-DD".
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-go@v5
+      with:
+        go-version: "1.22"
+    - name: Install noisefloor
+      shell: bash
+      run: go install "github.com/gaurangomkar/noisefloor/cmd/noisefloor@${{ inputs.version }}"
+    - name: Generate report
+      shell: bash
+      run: |
+        set -euo pipefail
+        mkdir -p "${{ inputs.output }}"
+        noisefloor report \
+          --config "${{ inputs.config }}" \
+          --output "${{ inputs.output }}" \
+          --formats "${{ inputs.formats }}" \
+          --fail-on-threshold="${{ inputs.fail_on_threshold }}"
+    - name: Job summary
+      if: always()
+      shell: bash
+      run: |
+        set -euo pipefail
+        report="${{ inputs.output }}/noisefloor.md"
+        if [ -f "$report" ]; then
+          cat "$report" >> "$GITHUB_STEP_SUMMARY"
+        fi
+    - name: Publish issue
+      if: always() && inputs.post_issue == 'true'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        ISSUE_TITLE: ${{ inputs.issue_title }}
+        REPORT: ${{ inputs.output }}/noisefloor.md
+      run: bash "${{ github.action_path }}/publish.sh"
