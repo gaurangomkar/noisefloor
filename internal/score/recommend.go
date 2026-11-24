@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gaurangomkar/noisefloor/internal/config"
+	"github.com/gaurangomkar/noisefloor/internal/duration"
 	"github.com/gaurangomkar/noisefloor/internal/model"
 )
 
@@ -151,7 +152,8 @@ func fmtTTR(m model.Metrics) string {
 	if m.TTRSamples == 0 {
 		return "n/a"
 	}
-	return time.Duration(m.MedianTTRSeconds * float64(time.Second)).Round(time.Second).String()
+	d := time.Duration(m.MedianTTRSeconds * float64(time.Second)).Round(time.Second)
+	return duration.Format(d)
 }
 
 func truncate(s string, n int) string {

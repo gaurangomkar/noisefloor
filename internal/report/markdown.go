@@ -25,7 +25,7 @@ func writeMarkdown(b *strings.Builder, rep model.Report) {
 	fmt.Fprintf(b, "# Alert hygiene report\n\n")
 	fmt.Fprintf(b, "Window %s to %s. Generated %s.\n\n", start, end, formatTime(rep.GeneratedAt, rep.Timezone))
 	if rep.Summary.ThresholdExceeded {
-		fmt.Fprintf(b, "The noise threshold is exceeded: %d rule(s) at or above %.1f, and %d are allowed. `noisefloor report` exits 2.\n\n", rep.Summary.NoisyRules, rep.Summary.MaxNoiseScore, rep.Summary.MaxNoisyRules)
+		fmt.Fprintf(b, "The noise threshold is exceeded: %s at or above %.1f, and %d are allowed. `noisefloor report` exits 2.\n\n", plural(rep.Summary.NoisyRules, "rule"), rep.Summary.MaxNoiseScore, rep.Summary.MaxNoisyRules)
 	} else {
 		fmt.Fprintf(b, "No rule is at or above the %.1f noise threshold (allowed noisy rules: %d).\n\n", rep.Summary.MaxNoiseScore, rep.Summary.MaxNoisyRules)
 	}
@@ -40,7 +40,7 @@ func writeMarkdown(b *strings.Builder, rep model.Report) {
 			if len(rs.Reasons) > 0 {
 				reason = rs.Reasons[0]
 			}
-			fmt.Fprintf(b, "%d. **%s %s** (%s, score %s). %s\n", i+1, strings.ToUpper(rs.Recommendation[:1])+rs.Recommendation[1:], rs.Alertname, rs.Team, scoreText(rs.Score), reason)
+			fmt.Fprintf(b, "%d. **%s %s** (%s, score %s). %s\n", i+1, model.ActionTitle(rs.Recommendation), rs.Alertname, rs.Team, scoreText(rs.Score), reason)
 		}
 		b.WriteString("\n")
 	}
@@ -192,6 +192,13 @@ func trimFloat(v float64) string {
 		return "0"
 	}
 	return s
+}
+
+func plural(n int, word string) string {
+	if n == 1 {
+		return fmt.Sprintf("%d %s", n, word)
+	}
+	return fmt.Sprintf("%d %ss", n, word)
 }
 
 func firstNonEmpty(vals ...string) string {

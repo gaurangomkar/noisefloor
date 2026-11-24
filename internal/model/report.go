@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 // ScorerVersion is stored on every report so a saved JSON file can be
 // compared with the scorer that produced it.
@@ -103,6 +106,25 @@ type Component struct {
 	Weight float64 `json:"weight"`
 	Value  float64 `json:"value"`
 	Points float64 `json:"points"`
+}
+
+// ActionTitle is the recommendation as it should be written in a sentence.
+func ActionTitle(recommendation string) string {
+	switch recommendation {
+	case RecSLO:
+		return "SLO"
+	case RecTune:
+		return "Tune"
+	case RecMute:
+		return "Mute"
+	case RecKeep:
+		return "Keep"
+	default:
+		if recommendation == "" {
+			return ""
+		}
+		return strings.ToUpper(recommendation[:1]) + recommendation[1:]
+	}
 }
 
 // ExceedsThreshold reports whether CI should fail this report.
