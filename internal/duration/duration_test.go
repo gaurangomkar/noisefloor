@@ -32,6 +32,18 @@ func TestParse(t *testing.T) {
 	}
 }
 
+func TestFormat(t *testing.T) {
+	if got := Format(2 * time.Minute); got != "2m" {
+		t.Fatalf("%s", got)
+	}
+	if got := Format(30 * time.Second); got != "30s" {
+		t.Fatalf("%s", got)
+	}
+	if got := Format(90 * time.Second); got != "1m30s" {
+		t.Fatalf("%s", got)
+	}
+}
+
 func TestParseRejects(t *testing.T) {
 	for _, in := range []string{"", "yesterday", "1", "10x", "d"} {
 		if _, err := Parse(in); err == nil {

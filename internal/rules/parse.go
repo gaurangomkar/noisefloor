@@ -40,10 +40,10 @@ func (r Rule) Match() *model.RuleMatch {
 		Annotations: r.Annotations,
 	}
 	if r.For > 0 {
-		m.For = r.For.String()
+		m.For = duration.Format(r.For)
 	}
 	if r.KeepFiringFor > 0 {
-		m.KeepFiringFor = r.KeepFiringFor.String()
+		m.KeepFiringFor = duration.Format(r.KeepFiringFor)
 	}
 	return m
 }
