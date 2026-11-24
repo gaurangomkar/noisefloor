@@ -1,0 +1,28 @@
+name: Bug report
+description: A score, report, source, or command did something wrong.
+title: "fix: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you ran, what you expected, and what you got. Paste the error and the relevant config with tokens removed.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `noisefloor version`.
+      placeholder: v0.1.0
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How to reproduce
+      description: A minimal config and, if you can, a few redacted alert events. Do not paste live tokens or customer data.
+    validations:
+      required: true
